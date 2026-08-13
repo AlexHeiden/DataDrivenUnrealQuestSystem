@@ -26,15 +26,14 @@ struct FQuestObjectiveProgress
 	bool bCompleted = false;
 };
 
-// Container sent by gameplay events to quest system through
-// gameplay message subsystem
+// Container sent by gameplay events to quest system through GMS
 USTRUCT(BlueprintType)
 struct FQuestEventPayload
 {
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadOnly)
-	FGameplayTag MainTag;
+	FGameplayTag InstigatorTag;
 
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayTagContainer ModifierTags;
