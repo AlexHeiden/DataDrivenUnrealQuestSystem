@@ -18,26 +18,14 @@ public class QuestSystem : ModuleRules
 			"StateTreeModule",
 			"GameplayStateTreeModule",
 			"UMG",
-			"Slate"
+			"Slate",
+			"GameplayTags"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 
 		PublicIncludePaths.AddRange(new string[] {
-			"QuestSystem",
-			"QuestSystem/Variant_Platforming",
-			"QuestSystem/Variant_Platforming/Animation",
-			"QuestSystem/Variant_Combat",
-			"QuestSystem/Variant_Combat/AI",
-			"QuestSystem/Variant_Combat/Animation",
-			"QuestSystem/Variant_Combat/Gameplay",
-			"QuestSystem/Variant_Combat/Interfaces",
-			"QuestSystem/Variant_Combat/UI",
-			"QuestSystem/Variant_SideScrolling",
-			"QuestSystem/Variant_SideScrolling/AI",
-			"QuestSystem/Variant_SideScrolling/Gameplay",
-			"QuestSystem/Variant_SideScrolling/Interfaces",
-			"QuestSystem/Variant_SideScrolling/UI"
+			"QuestSystem"
 		});
 
 		// Uncomment if you are using Slate UI
