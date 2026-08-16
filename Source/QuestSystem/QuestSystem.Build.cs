@@ -19,7 +19,8 @@ public class QuestSystem : ModuleRules
 			"GameplayStateTreeModule",
 			"UMG",
 			"Slate",
-			"GameplayTags"
+			"GameplayTags",
+			"GameplayMessageRuntime"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

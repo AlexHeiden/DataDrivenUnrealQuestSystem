@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "GameplayMessageRuntime/Public/GameFramework/GameplayMessageSubsystem.h"
 #include "GameplayTagContainer.h"
 #include "Data Classes/QuestDefinition.h"
 #include "Data Classes/QuestObjectiveData.h"
@@ -30,6 +31,9 @@ struct FActiveQuestState
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FQuestObjectiveProgress> ObjectiveProgresses;
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 CurrentObjectiveIndex = 0;
 };
 
 UCLASS(Blueprintable)
@@ -55,5 +59,11 @@ private:
 	
 	UPROPERTY()
 	TSet<FGameplayTag> CompletedQuestIDs;
-};
 
+	TMap<FGameplayTag, FGameplayMessageListenerHandle> ListenerHandles;
+	TMap<FGameplayTag, int32> ListenerRefCounts;
+
+	void HandleGameplayEvent(FGameplayTag EventTag, const FQuestEventPayload& EventPayload);
+	void RegisterQuestListeners(FGameplayTag EventID);
+	void UnregisterQuestListeners(FGameplayTag EventID);
+};
