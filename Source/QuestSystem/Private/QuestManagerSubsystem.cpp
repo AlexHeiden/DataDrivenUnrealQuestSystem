@@ -10,7 +10,37 @@ void UQuestManagerSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-int UQuestManagerSubsystem::Test()
+bool UQuestManagerSubsystem::AcceptQuest(UQuestDefinition* QuestDefinition)
 {
-	return CompletedQuestIDs.Num();
+	if (QuestDefinition == nullptr
+		|| !QuestDefinition->QuestID.IsValid()
+		|| ActiveQuests.Contains(QuestDefinition->QuestID)
+		|| CompletedQuestIDs.Contains(QuestDefinition->QuestID))
+	{
+		return false;
+	}
+	
+	ActiveQuests.Add(QuestDefinition->QuestID, FActiveQuestState(QuestDefinition));
+
+	return true;
+}
+
+bool UQuestManagerSubsystem::IsQuestActive(FGameplayTag QuestID) const
+{
+	if (!QuestID.IsValid())
+	{
+		return false;
+	}
+	
+	return ActiveQuests.Contains(QuestID);
+}
+
+bool UQuestManagerSubsystem::IsQuestCompleted(FGameplayTag QuestID) const
+{
+	if (!QuestID.IsValid())
+	{
+		return false;
+	}
+
+	return CompletedQuestIDs.Contains(QuestID);
 }

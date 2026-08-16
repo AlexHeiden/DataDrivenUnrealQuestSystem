@@ -13,6 +13,15 @@ struct FActiveQuestState
 {
 	GENERATED_BODY()
 
+	FActiveQuestState() = default;
+
+	FActiveQuestState(UQuestDefinition* InQuestDefinition):
+		QuestDefinition(InQuestDefinition)
+	{
+		QuestState = EQuestState::Active;
+		ObjectiveProgresses.Init(FQuestObjectiveProgress(), QuestDefinition->Objectives.Num());
+	}
+	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UQuestDefinition> QuestDefinition = nullptr;
 
@@ -32,14 +41,19 @@ public:
 	virtual void Deinitialize() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Quest")
-	int Test();
+	bool AcceptQuest(UQuestDefinition* QuestDefinition);
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+	bool IsQuestActive(FGameplayTag QuestID) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+	bool IsQuestCompleted(FGameplayTag QuestID) const;
 
 private:
-
 	UPROPERTY()
-	
+	TMap<FGameplayTag, FActiveQuestState> ActiveQuests;
 	
 	UPROPERTY()
-	TArray<FGameplayTag> CompletedQuestIDs;
+	TSet<FGameplayTag> CompletedQuestIDs;
 };
 
