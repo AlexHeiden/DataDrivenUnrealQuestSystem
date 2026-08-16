@@ -22,16 +22,3 @@ struct FQuestObjectiveData
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText Description;
 };
-
-// Runtime progress for a single objective within an active quest.
-USTRUCT(BlueprintType)
-struct FQuestObjectiveProgress
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadOnly)
-	int32 CurrentCount = 0;
-
-	UPROPERTY(BlueprintReadOnly)
-	bool bCompleted = false;
-};
