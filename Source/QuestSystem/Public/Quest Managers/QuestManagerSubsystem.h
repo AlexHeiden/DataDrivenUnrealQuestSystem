@@ -58,11 +58,12 @@ private:
 	TMap<FGameplayTag, FActiveQuestState> ActiveQuests;
 	
 	UPROPERTY()
-	TSet<FGameplayTag> CompletedQuestIDs;
+	FGameplayTagContainer CompletedQuestIDs;
 
 	TMap<FGameplayTag, FGameplayMessageListenerHandle> ListenerHandles;
 	TMap<FGameplayTag, int32> ListenerRefCounts;
 
+	bool CheckPrerequisites(UQuestDefinition* QuestDefinition) const;
 	void HandleGameplayEvent(FGameplayTag EventTag, const FQuestEventPayload& EventPayload);
 	void RegisterQuestListeners(FGameplayTag EventID);
 	void UnregisterQuestListeners(FGameplayTag EventID);

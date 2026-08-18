@@ -17,7 +17,8 @@ bool UQuestManagerSubsystem::AcceptQuest(UQuestDefinition* QuestDefinition)
 	if (QuestDefinition == nullptr
 		|| !QuestDefinition->QuestID.IsValid()
 		|| ActiveQuests.Contains(QuestDefinition->QuestID)
-		|| CompletedQuestIDs.Contains(QuestDefinition->QuestID))
+		|| CompletedQuestIDs.HasTag(QuestDefinition->QuestID)
+		|| !CheckPrerequisites(QuestDefinition))
 	{
 		return false;
 	}
@@ -45,7 +46,17 @@ bool UQuestManagerSubsystem::IsQuestCompleted(FGameplayTag QuestID) const
 		return false;
 	}
 
-	return CompletedQuestIDs.Contains(QuestID);
+	return CompletedQuestIDs.HasTag(QuestID);
+}
+
+bool UQuestManagerSubsystem::CheckPrerequisites(UQuestDefinition* QuestDefinition) const
+{
+	if (QuestDefinition == nullptr)
+	{
+		return false;
+	}
+	
+	return CompletedQuestIDs.HasAll(QuestDefinition->RequiredCompletedQuests);
 }
 
 void UQuestManagerSubsystem::HandleGameplayEvent(FGameplayTag EventTag, const FQuestEventPayload& EventPayload)
