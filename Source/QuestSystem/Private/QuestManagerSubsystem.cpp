@@ -69,11 +69,15 @@ void UQuestManagerSubsystem::HandleGameplayEvent(FGameplayTag EventTag, const FQ
 	for (auto& Pair : ActiveQuests)
 	{
 		FActiveQuestState& ActiveQuestState = Pair.Value;
-		FQuestObjectiveData& CurrentObjectiveData =
+		if (ActiveQuestState.QuestState != EQuestState::Active)
+		{
+			continue;
+		}
+		
+		const FQuestObjectiveData& CurrentObjectiveData =
 			ActiveQuestState.QuestDefinition->Objectives[ActiveQuestState.CurrentObjectiveIndex];
 		FGameplayTagContainer EventTags = EventPayload.ModifierTags;
 		EventTags.AddTag(EventPayload.InstigatorTag);
-		
 		if (CurrentObjectiveData.TriggerTag != EventTag
 			|| !EventTags.HasAll(CurrentObjectiveData.RequiredModifierTags))
 		{
