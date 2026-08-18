@@ -61,7 +61,25 @@ bool UQuestManagerSubsystem::CheckPrerequisites(UQuestDefinition* QuestDefinitio
 
 void UQuestManagerSubsystem::HandleGameplayEvent(FGameplayTag EventTag, const FQuestEventPayload& EventPayload)
 {
-	UE_LOG(LogTemp, Log, TEXT("Quest Progressed"));
+	if (!EventPayload.InstigatorTag.IsValid() || EventPayload.Amount == 0)
+	{
+		return;
+	}
+	
+	for (auto& Pair : ActiveQuests)
+	{
+		FActiveQuestState& ActiveQuestState = Pair.Value;
+		FQuestObjectiveData& CurrentObjectiveData =
+			ActiveQuestState.QuestDefinition->Objectives[ActiveQuestState.CurrentObjectiveIndex];
+		FGameplayTagContainer EventTags = EventPayload.ModifierTags;
+		EventTags.AddTag(EventPayload.InstigatorTag);
+		
+		if (CurrentObjectiveData.TriggerTag != EventTag
+			|| !EventTags.HasAll(CurrentObjectiveData.RequiredModifierTags))
+		{
+			continue;
+		}
+	}
 }
 
 void UQuestManagerSubsystem::RegisterQuestListeners(FGameplayTag EventID)
