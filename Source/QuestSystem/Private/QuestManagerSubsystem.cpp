@@ -83,6 +83,18 @@ void UQuestManagerSubsystem::HandleGameplayEvent(FGameplayTag EventTag, const FQ
 		{
 			continue;
 		}
+
+		FQuestObjectiveProgress& CurrentObjectiveProgress
+			= ActiveQuestState.ObjectiveProgresses[ActiveQuestState.CurrentObjectiveIndex];
+		CurrentObjectiveProgress.CurrentCount
+			= FMath::Max(CurrentObjectiveProgress.CurrentCount + EventPayload.Amount, 0);
+		
+		if (CurrentObjectiveProgress.CurrentCount >= CurrentObjectiveData.RequiredCount)
+		{
+			CurrentObjectiveProgress.bCompleted = true;
+			ActiveQuestState.CurrentObjectiveIndex++;
+			//TODO: unregister old objective listener and subscribe new objective listener or complete quest
+		}
 	}
 }
 
