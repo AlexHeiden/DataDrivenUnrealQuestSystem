@@ -62,8 +62,13 @@ private:
 
 	TMap<FGameplayTag, FGameplayMessageListenerHandle> ListenerHandles;
 	TMap<FGameplayTag, int32> ListenerRefCounts;
-
+	
 	bool CheckPrerequisites(UQuestDefinition* QuestDefinition) const;
+
+	static bool IsObjectiveCompleted(const FQuestObjectiveProgress* ObjectiveProgress, const FQuestObjectiveData* ObjectiveData);
+	static bool HasCompletedAllObjectives(const FActiveQuestState* ActiveQuestState);
+
+	void CompleteCurrentObjective(FQuestObjectiveProgress* CurrentObjectiveProgress, FActiveQuestState* ActiveQuestState);
 	void HandleGameplayEvent(FGameplayTag EventTag, const FQuestEventPayload& EventPayload);
 	void RegisterQuestListeners(FGameplayTag EventID);
 	void UnregisterQuestListeners(FGameplayTag EventID);

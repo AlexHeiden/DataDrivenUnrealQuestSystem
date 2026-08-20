@@ -59,13 +59,48 @@ bool UQuestManagerSubsystem::CheckPrerequisites(UQuestDefinition* QuestDefinitio
 	return CompletedQuestIDs.HasAll(QuestDefinition->RequiredCompletedQuests);
 }
 
+bool UQuestManagerSubsystem::IsObjectiveCompleted(const FQuestObjectiveProgress* ObjectiveProgress,
+	const FQuestObjectiveData* ObjectiveData)
+{
+	if (ObjectiveProgress == nullptr || ObjectiveData == nullptr)
+	{
+		return false;
+	}
+
+	return ObjectiveProgress->CurrentCount >= ObjectiveData->RequiredCount;
+}
+
+bool UQuestManagerSubsystem::HasCompletedAllObjectives(const FActiveQuestState* ActiveQuestState)
+{
+	if (ActiveQuestState == nullptr)
+	{
+		return false;
+	}
+
+	return ActiveQuestState->CurrentObjectiveIndex >= ActiveQuestState->QuestDefinition->Objectives.Num();
+}
+
+void UQuestManagerSubsystem::CompleteCurrentObjective(FQuestObjectiveProgress* CurrentObjectiveProgress,
+                                                      FActiveQuestState* ActiveQuestState)
+{
+	if (CurrentObjectiveProgress == nullptr || ActiveQuestState == nullptr)
+	{
+		return;
+	}
+	
+	UnregisterQuestListeners(ActiveQuestState->QuestDefinition->Objectives[ActiveQuestState->CurrentObjectiveIndex].TriggerTag);
+	CurrentObjectiveProgress->bCompleted = true;
+	ActiveQuestState->CurrentObjectiveIndex++;
+}
+
 void UQuestManagerSubsystem::HandleGameplayEvent(FGameplayTag EventTag, const FQuestEventPayload& EventPayload)
 {
 	if (!EventPayload.InstigatorTag.IsValid() || EventPayload.Amount == 0)
 	{
 		return;
 	}
-	
+
+	TArray<FGameplayTag> QuestsToComplete;
 	for (auto& Pair : ActiveQuests)
 	{
 		FActiveQuestState& ActiveQuestState = Pair.Value;
@@ -78,23 +113,40 @@ void UQuestManagerSubsystem::HandleGameplayEvent(FGameplayTag EventTag, const FQ
 			ActiveQuestState.QuestDefinition->Objectives[ActiveQuestState.CurrentObjectiveIndex];
 		FGameplayTagContainer EventTags = EventPayload.ModifierTags;
 		EventTags.AddTag(EventPayload.InstigatorTag);
+
+		// Check that the objective was listening for this event
+		// If it was, check that event has all required objective tags
 		if (CurrentObjectiveData.TriggerTag != EventTag
 			|| !EventTags.HasAll(CurrentObjectiveData.RequiredModifierTags))
 		{
 			continue;
 		}
 
+		// Progress the objective
 		FQuestObjectiveProgress& CurrentObjectiveProgress
 			= ActiveQuestState.ObjectiveProgresses[ActiveQuestState.CurrentObjectiveIndex];
 		CurrentObjectiveProgress.CurrentCount
 			= FMath::Max(CurrentObjectiveProgress.CurrentCount + EventPayload.Amount, 0);
 		
-		if (CurrentObjectiveProgress.CurrentCount >= CurrentObjectiveData.RequiredCount)
+		if (!IsObjectiveCompleted(&CurrentObjectiveProgress, &CurrentObjectiveData))
 		{
-			CurrentObjectiveProgress.bCompleted = true;
-			ActiveQuestState.CurrentObjectiveIndex++;
-			//TODO: unregister old objective listener and subscribe new objective listener or complete quest
+			continue;
 		}
+		CompleteCurrentObjective(&CurrentObjectiveProgress, &ActiveQuestState);
+		
+		if (!HasCompletedAllObjectives(&ActiveQuestState))
+		{
+			RegisterQuestListeners(ActiveQuestState.QuestDefinition->Objectives[ActiveQuestState.CurrentObjectiveIndex].TriggerTag);
+			continue;
+		}
+
+		QuestsToComplete.Add(ActiveQuestState.QuestDefinition->QuestID);
+	}
+
+	for (FGameplayTag& QuestID : QuestsToComplete)
+	{
+		CompletedQuestIDs.AddTag(QuestID);
+		ActiveQuests.Remove(QuestID);
 	}
 }
 
