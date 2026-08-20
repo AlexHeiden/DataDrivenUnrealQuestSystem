@@ -9,6 +9,15 @@ void UQuestManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UQuestManagerSubsystem::Deinitialize()
 {
+	UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
+	for (auto& Pair: ListenerHandles)
+	{
+		GameplayMessageSubsystem.UnregisterListener(Pair.Value);
+	}
+
+	ListenerHandles.Empty();
+	ListenerRefCounts.Empty();
+	
 	Super::Deinitialize();
 }
 
@@ -16,16 +25,18 @@ bool UQuestManagerSubsystem::AcceptQuest(UQuestDefinition* QuestDefinition)
 {
 	if (QuestDefinition == nullptr
 		|| !QuestDefinition->QuestID.IsValid()
+		|| QuestDefinition->Objectives.Num() == 0
 		|| ActiveQuests.Contains(QuestDefinition->QuestID)
 		|| CompletedQuestIDs.HasTag(QuestDefinition->QuestID)
 		|| !CheckPrerequisites(QuestDefinition))
 	{
 		return false;
 	}
-	
-	ActiveQuests.Emplace(QuestDefinition->QuestID, FActiveQuestState(QuestDefinition));
-	RegisterQuestListeners(QuestDefinition->Objectives[0].TriggerTag);
 
+	FActiveQuestState ActiveQuestState(QuestDefinition);
+	RegisterQuestListeners(QuestDefinition->Objectives[ActiveQuestState.CurrentObjectiveIndex].TriggerTag);
+	ActiveQuests.Emplace(QuestDefinition->QuestID, MoveTemp(ActiveQuestState));
+	
 	return true;
 }
 
@@ -49,7 +60,7 @@ bool UQuestManagerSubsystem::IsQuestCompleted(FGameplayTag QuestID) const
 	return CompletedQuestIDs.HasTag(QuestID);
 }
 
-bool UQuestManagerSubsystem::CheckPrerequisites(UQuestDefinition* QuestDefinition) const
+bool UQuestManagerSubsystem::CheckPrerequisites(const UQuestDefinition* QuestDefinition) const
 {
 	if (QuestDefinition == nullptr)
 	{
@@ -158,17 +169,14 @@ void UQuestManagerSubsystem::RegisterQuestListeners(FGameplayTag EventID)
 	}
 
 	int32& RefCount = ListenerRefCounts.FindOrAdd(EventID, 0);
-	if (RefCount > 0)
+	if (RefCount == 0)
 	{
-		++RefCount;
-		return;
+		UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
+		FGameplayMessageListenerHandle ListenerHandle = GameplayMessageSubsystem.RegisterListener<FQuestEventPayload>(
+			EventID, this, &UQuestManagerSubsystem::HandleGameplayEvent);
+		ListenerHandles.Emplace(EventID, ListenerHandle);
 	}
-
-	UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
-	FGameplayMessageListenerHandle ListenerHandle = GameplayMessageSubsystem.RegisterListener<FQuestEventPayload>(
-		EventID, this, &UQuestManagerSubsystem::HandleGameplayEvent);
-
-	ListenerHandles.Emplace(EventID, ListenerHandle);
+	
 	++RefCount;
 }
 

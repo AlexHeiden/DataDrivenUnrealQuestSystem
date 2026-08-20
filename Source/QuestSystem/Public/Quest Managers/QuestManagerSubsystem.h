@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
-#include "GameplayMessageRuntime/Public/GameFramework/GameplayMessageSubsystem.h"
+#include "GameFramework/GameplayMessageSubsystem.h"
 #include "GameplayTagContainer.h"
 #include "Data Classes/QuestDefinition.h"
 #include "Data Classes/QuestObjectiveData.h"
@@ -63,7 +63,7 @@ private:
 	TMap<FGameplayTag, FGameplayMessageListenerHandle> ListenerHandles;
 	TMap<FGameplayTag, int32> ListenerRefCounts;
 	
-	bool CheckPrerequisites(UQuestDefinition* QuestDefinition) const;
+	bool CheckPrerequisites(const UQuestDefinition* QuestDefinition) const;
 
 	static bool IsObjectiveCompleted(const FQuestObjectiveProgress* ObjectiveProgress, const FQuestObjectiveData* ObjectiveData);
 	static bool HasCompletedAllObjectives(const FActiveQuestState* ActiveQuestState);
