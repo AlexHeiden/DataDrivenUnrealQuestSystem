@@ -5,6 +5,8 @@
 void UQuestManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
+	OnQuestStateChanged.AddDynamic(this, &UQuestManagerSubsystem::UQuestManagerSubsystem::DebugLogQuestStateChanged);
+	OnObjectiveProgressChanged.AddDynamic(this, &UQuestManagerSubsystem::DebugLogObjectiveProgressChanged);
 }
 
 void UQuestManagerSubsystem::Deinitialize()
@@ -36,6 +38,8 @@ bool UQuestManagerSubsystem::AcceptQuest(UQuestDefinition* QuestDefinition)
 	FActiveQuestState ActiveQuestState(QuestDefinition);
 	RegisterQuestListeners(QuestDefinition->Objectives[ActiveQuestState.CurrentObjectiveIndex].TriggerTag);
 	ActiveQuests.Emplace(QuestDefinition->QuestID, MoveTemp(ActiveQuestState));
+
+	OnQuestStateChanged.Broadcast(QuestDefinition->QuestID);
 	
 	return true;
 }
@@ -138,6 +142,8 @@ void UQuestManagerSubsystem::HandleGameplayEvent(FGameplayTag EventTag, const FQ
 			= ActiveQuestState.ObjectiveProgresses[ActiveQuestState.CurrentObjectiveIndex];
 		CurrentObjectiveProgress.CurrentCount
 			= FMath::Max(CurrentObjectiveProgress.CurrentCount + EventPayload.Amount, 0);
+
+		OnObjectiveProgressChanged.Broadcast(ActiveQuestState.QuestDefinition->QuestID, ActiveQuestState.CurrentObjectiveIndex);
 		
 		if (!IsObjectiveCompleted(&CurrentObjectiveProgress, &CurrentObjectiveData))
 		{
@@ -158,6 +164,8 @@ void UQuestManagerSubsystem::HandleGameplayEvent(FGameplayTag EventTag, const FQ
 	{
 		CompletedQuestIDs.AddTag(QuestID);
 		ActiveQuests.Remove(QuestID);
+
+		OnQuestStateChanged.Broadcast(QuestID);
 	}
 }
 
@@ -207,3 +215,12 @@ void UQuestManagerSubsystem::UnregisterQuestListeners(FGameplayTag EventID)
 	}
 }
 
+void UQuestManagerSubsystem::DebugLogQuestStateChanged(FGameplayTag QuestID)
+{
+	UE_LOG(LogTemp, Log, TEXT("Quest state changed: %s"), *QuestID.ToString())
+}
+
+void UQuestManagerSubsystem::DebugLogObjectiveProgressChanged(FGameplayTag QuestID, int32 ObjectiveIndex)
+{
+	UE_LOG(LogTemp, Log, TEXT("Quest objective changed: %s, objective: %d"), *QuestID.ToString(), ObjectiveIndex);
+}

@@ -36,11 +36,20 @@ struct FActiveQuestState
 	int32 CurrentObjectiveIndex = 0;
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestStateChanged, FGameplayTag, QuestID);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnObjectiveProgressChanged, FGameplayTag, QuestID, int32, ObjectiveIndex);
+
 UCLASS(Blueprintable)
 class UQuestManagerSubsystem: public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(BlueprintAssignable, Category="Quest")
+	FOnQuestStateChanged OnQuestStateChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="Quest")
+	FOnObjectiveProgressChanged OnObjectiveProgressChanged;
+	
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
@@ -68,6 +77,11 @@ private:
 	static bool IsObjectiveCompleted(const FQuestObjectiveProgress* ObjectiveProgress, const FQuestObjectiveData* ObjectiveData);
 	static bool HasCompletedAllObjectives(const FActiveQuestState* ActiveQuestState);
 
+	UFUNCTION()
+	void DebugLogQuestStateChanged(FGameplayTag QuestID);
+	UFUNCTION()
+	void DebugLogObjectiveProgressChanged(FGameplayTag QuestID, int32 ObjectiveIndex);
+	
 	void CompleteCurrentObjective(FQuestObjectiveProgress* CurrentObjectiveProgress, FActiveQuestState* ActiveQuestState);
 	void HandleGameplayEvent(FGameplayTag EventTag, const FQuestEventPayload& EventPayload);
 	void RegisterQuestListeners(FGameplayTag EventID);
