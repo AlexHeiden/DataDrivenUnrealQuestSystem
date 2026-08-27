@@ -8,6 +8,9 @@ class UQuestGiverComponent: public UActorComponent
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Quests")
+	TObjectPtr<UQuestDefinition> QuestToGive;
+	
 	UFUNCTION(BlueprintCallable, Category = "Quest")
-	bool TryAcceptQuest(UQuestDefinition* QuestDefinition);
+	bool TryAcceptQuest();
 };

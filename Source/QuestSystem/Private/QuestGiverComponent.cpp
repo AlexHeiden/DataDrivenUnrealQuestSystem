@@ -2,8 +2,13 @@
 
 #include "Quest Managers/QuestManagerSubsystem.h"
 
-bool UQuestGiverComponent::TryAcceptQuest(UQuestDefinition* QuestDefinition)
+bool UQuestGiverComponent::TryAcceptQuest()
 {
+	if (!QuestToGive)
+	{
+		return false;
+	}
+	
 	UWorld* World = GetWorld();
 	if (!World)
 	{
@@ -22,5 +27,5 @@ bool UQuestGiverComponent::TryAcceptQuest(UQuestDefinition* QuestDefinition)
 		return false;
 	}
 
-	return QuestManager->AcceptQuest(QuestDefinition);
+	return QuestManager->AcceptQuest(QuestToGive);
 }
