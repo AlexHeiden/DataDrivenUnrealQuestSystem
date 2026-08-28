@@ -21,7 +21,7 @@ bool UQuestGiverComponent::TryAcceptQuest()
 		return false;
 	}
 
-	UQuestManagerSubsystem* QuestManager = GameInstance->GetSubsystem<UQuestManagerSubsystem>();
+		UQuestManagerSubsystem* QuestManager = GameInstance->GetSubsystem<UQuestManagerSubsystem>();
 	if (!QuestManager)
 	{
 		return false;
