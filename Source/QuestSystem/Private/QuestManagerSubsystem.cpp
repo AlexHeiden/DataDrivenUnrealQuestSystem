@@ -177,17 +177,17 @@ void UQuestManagerSubsystem::HandleGameplayEvent(FGameplayTag EventTag, const FQ
 			= ActiveQuestState.ObjectiveProgresses[ActiveQuestState.CurrentObjectiveIndex];
 		CurrentObjectiveProgress.CurrentCount
 			= FMath::Max(CurrentObjectiveProgress.CurrentCount + EventPayload.Amount, 0);
-
-		OnObjectiveProgressChanged.Broadcast(ActiveQuestState.QuestDefinition->QuestID, ActiveQuestState.CurrentObjectiveIndex);
 		
 		if (!IsObjectiveCompleted(&CurrentObjectiveProgress, &CurrentObjectiveData))
 		{
+			OnObjectiveProgressChanged.Broadcast(ActiveQuestState.QuestDefinition->QuestID, ActiveQuestState.CurrentObjectiveIndex);
 			continue;
 		}
 		CompleteCurrentObjective(&CurrentObjectiveProgress, &ActiveQuestState);
 		
 		if (!HasCompletedAllObjectives(&ActiveQuestState))
 		{
+			OnObjectiveProgressChanged.Broadcast(ActiveQuestState.QuestDefinition->QuestID, ActiveQuestState.CurrentObjectiveIndex);
 			RegisterQuestListeners(ActiveQuestState.QuestDefinition->Objectives[ActiveQuestState.CurrentObjectiveIndex].TriggerTag);
 			continue;
 		}
