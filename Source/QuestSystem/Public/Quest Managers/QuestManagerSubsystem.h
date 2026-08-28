@@ -69,7 +69,7 @@ public:
 	FText GetQuestName(FGameplayTag QuestID) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Quest")
-	FText GetCurrentObjectiveDescription(FGameplayTag QuestID) const;
+	FText GetCurrentObjectiveText(FGameplayTag QuestID) const;
 
 private:
 	UPROPERTY()

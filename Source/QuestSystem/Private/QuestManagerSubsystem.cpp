@@ -81,15 +81,22 @@ FText UQuestManagerSubsystem::GetQuestName(FGameplayTag QuestID) const
 	return ActiveQuests.Find(QuestID)->QuestDefinition->QuestName;
 }
 
-FText UQuestManagerSubsystem::GetCurrentObjectiveDescription(FGameplayTag QuestID) const
+FText UQuestManagerSubsystem::GetCurrentObjectiveText(FGameplayTag QuestID) const
 {
-	if (!ActiveQuests.Contains(QuestID))
+	const FActiveQuestState* ActiveQuestState = ActiveQuests.Find(QuestID);
+	if (!ActiveQuestState || ActiveQuestState->CurrentObjectiveIndex >= ActiveQuestState->ObjectiveProgresses.Num())
 	{
 		return FText::GetEmpty();
 	}
 
-	const FActiveQuestState* ActiveQuestState = ActiveQuests.Find(QuestID);
-	return ActiveQuestState->QuestDefinition->Objectives[ActiveQuestState->CurrentObjectiveIndex].Description;
+	const FQuestObjectiveData& CurrentObjectiveData = ActiveQuestState->QuestDefinition->Objectives[ActiveQuestState->CurrentObjectiveIndex];
+	const FQuestObjectiveProgress& CurrentObjectiveProgress = ActiveQuestState->ObjectiveProgresses[ActiveQuestState->CurrentObjectiveIndex];
+	return FText::Format(
+		NSLOCTEXT("Quest", "ObjectiveFormat", "{0}: {1}/{2}"),
+		CurrentObjectiveData.Description,
+		CurrentObjectiveProgress.CurrentCount,
+		CurrentObjectiveData.RequiredCount
+	);
 }
 
 bool UQuestManagerSubsystem::CheckPrerequisites(const UQuestDefinition* QuestDefinition) const
