@@ -64,6 +64,34 @@ bool UQuestManagerSubsystem::IsQuestCompleted(FGameplayTag QuestID) const
 	return CompletedQuestIDs.HasTag(QuestID);
 }
 
+TArray<FGameplayTag> UQuestManagerSubsystem::GetActiveQuestIDs() const
+{
+	TArray<FGameplayTag> ActiveQuestIDs;
+	ActiveQuests.GetKeys(ActiveQuestIDs);
+	return ActiveQuestIDs;
+}
+
+FText UQuestManagerSubsystem::GetQuestName(FGameplayTag QuestID) const
+{
+	if (!ActiveQuests.Contains(QuestID))
+	{
+		return FText::GetEmpty();
+	}
+
+	return ActiveQuests.Find(QuestID)->QuestDefinition->QuestName;
+}
+
+FText UQuestManagerSubsystem::GetCurrentObjectiveDescription(FGameplayTag QuestID) const
+{
+	if (!ActiveQuests.Contains(QuestID))
+	{
+		return FText::GetEmpty();
+	}
+
+	const FActiveQuestState* ActiveQuestState = ActiveQuests.Find(QuestID);
+	return ActiveQuestState->QuestDefinition->Objectives[ActiveQuestState->CurrentObjectiveIndex].Description;
+}
+
 bool UQuestManagerSubsystem::CheckPrerequisites(const UQuestDefinition* QuestDefinition) const
 {
 	if (QuestDefinition == nullptr)

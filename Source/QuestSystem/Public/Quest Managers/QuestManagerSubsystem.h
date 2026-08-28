@@ -62,6 +62,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 	bool IsQuestCompleted(FGameplayTag QuestID) const;
 
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+	TArray<FGameplayTag> GetActiveQuestIDs() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+	FText GetQuestName(FGameplayTag QuestID) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+	FText GetCurrentObjectiveDescription(FGameplayTag QuestID) const;
+
 private:
 	UPROPERTY()
 	TMap<FGameplayTag, FActiveQuestState> ActiveQuests;
