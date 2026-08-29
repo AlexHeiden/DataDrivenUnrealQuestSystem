@@ -26,6 +26,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTagContainer RequiredCompletedQuests;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0"))
+	int32 RewardXP = 0;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FQuestObjectiveData> Objectives;
 	

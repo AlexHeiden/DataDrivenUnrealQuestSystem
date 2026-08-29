@@ -7,6 +7,7 @@ void UQuestManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 	OnQuestStateChanged.AddDynamic(this, &UQuestManagerSubsystem::UQuestManagerSubsystem::DebugLogQuestStateChanged);
 	OnObjectiveProgressChanged.AddDynamic(this, &UQuestManagerSubsystem::DebugLogObjectiveProgressChanged);
+	OnQuestRewardGranted.AddDynamic(this, &UQuestManagerSubsystem::DebugLogQuestRewardGranted);
 }
 
 void UQuestManagerSubsystem::Deinitialize()
@@ -198,9 +199,10 @@ void UQuestManagerSubsystem::HandleGameplayEvent(FGameplayTag EventTag, const FQ
 	for (FGameplayTag& QuestID : QuestsToComplete)
 	{
 		CompletedQuestIDs.AddTag(QuestID);
-		ActiveQuests.Remove(QuestID);
+		const int32 RewardXP = ActiveQuests.FindAndRemoveChecked(QuestID).QuestDefinition->RewardXP;
 
 		OnQuestStateChanged.Broadcast(QuestID);
+		OnQuestRewardGranted.Broadcast(QuestID, RewardXP);
 	}
 }
 
@@ -258,4 +260,9 @@ void UQuestManagerSubsystem::DebugLogQuestStateChanged(FGameplayTag QuestID)
 void UQuestManagerSubsystem::DebugLogObjectiveProgressChanged(FGameplayTag QuestID, int32 ObjectiveIndex)
 {
 	UE_LOG(LogTemp, Log, TEXT("Quest objective changed: %s, objective: %d"), *QuestID.ToString(), ObjectiveIndex);
+}
+
+void UQuestManagerSubsystem::DebugLogQuestRewardGranted(FGameplayTag QuestID, int32 RewardXP)
+{
+	UE_LOG(LogTemp, Log, TEXT("Quest reward granted. %s: %d XP"), *QuestID.ToString(), RewardXP);
 }
