@@ -1,6 +1,8 @@
 ﻿#include "Public/Quest Managers/QuestManagerSubsystem.h"
 
 #include "GameFramework/GameplayMessageSubsystem.h"
+#include "Kismet/GameplayStatics.h"
+#include "Quest Managers/QuestSaveGame.h"
 
 void UQuestManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -98,6 +100,23 @@ FText UQuestManagerSubsystem::GetCurrentObjectiveText(FGameplayTag QuestID) cons
 		CurrentObjectiveProgress.CurrentCount,
 		CurrentObjectiveData.RequiredCount
 	);
+}
+
+void UQuestManagerSubsystem::SaveQuestState() const
+{
+	UQuestSaveGame* SaveObject = Cast<UQuestSaveGame>(UGameplayStatics::CreateSaveGameObject(UQuestSaveGame::StaticClass()));
+	SaveObject->CompletedQuestIDs = CompletedQuestIDs;
+
+	for (auto& Pair : ActiveQuests)
+	{
+		FQuestSaveData QuestSaveData;
+		QuestSaveData.CurrentObjectiveIndex = Pair.Value.CurrentObjectiveIndex;
+		QuestSaveData.ObjectiveProgresses = Pair.Value.ObjectiveProgresses;
+
+		SaveObject->QuestProgresses.Add(Pair.Key, QuestSaveData);
+	}
+
+	UGameplayStatics::SaveGameToSlot(SaveObject, TEXT("SaveSlot1"), 0);
 }
 
 bool UQuestManagerSubsystem::CheckPrerequisites(const UQuestDefinition* QuestDefinition) const

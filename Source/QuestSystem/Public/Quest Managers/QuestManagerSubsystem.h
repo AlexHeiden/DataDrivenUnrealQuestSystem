@@ -75,6 +75,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 	FText GetCurrentObjectiveText(FGameplayTag QuestID) const;
 
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+	void SaveQuestState() const;
+
 private:
 	UPROPERTY()
 	TMap<FGameplayTag, FActiveQuestState> ActiveQuests;
