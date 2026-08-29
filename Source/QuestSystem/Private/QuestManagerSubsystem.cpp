@@ -1,5 +1,6 @@
 ﻿#include "Public/Quest Managers/QuestManagerSubsystem.h"
 
+#include "Engine/AssetManager.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Quest Managers/QuestSaveGame.h"
@@ -117,6 +118,35 @@ void UQuestManagerSubsystem::SaveQuestState() const
 	}
 
 	UGameplayStatics::SaveGameToSlot(SaveObject, TEXT("SaveSlot1"), 0);
+}
+
+void UQuestManagerSubsystem::LoadQuestState()
+{
+	UQuestSaveGame* SaveObject = Cast<UQuestSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("SaveSlot1"), 0));
+	if (!SaveObject)
+	{
+		return;
+	}
+	
+	CompletedQuestIDs = SaveObject->CompletedQuestIDs;
+	ActiveQuests.Empty();
+	for (const auto& Pair : SaveObject->QuestProgresses)
+	{
+		UQuestDefinition* QuestDefinition = ResolveQuestDefinition(Pair.Key);
+		if (!QuestDefinition)
+		{
+			continue;
+		}
+
+		FActiveQuestState ActiveQuestState(QuestDefinition);
+		ActiveQuestState.CurrentObjectiveIndex = Pair.Value.CurrentObjectiveIndex;
+		ActiveQuestState.ObjectiveProgresses = Pair.Value.ObjectiveProgresses;
+
+		ActiveQuests.Emplace(Pair.Key, MoveTemp(ActiveQuestState));
+		RegisterQuestListeners(QuestDefinition->Objectives[ActiveQuestState.CurrentObjectiveIndex].TriggerTag);
+	}
+
+	OnQuestsLoaded.Broadcast();
 }
 
 bool UQuestManagerSubsystem::CheckPrerequisites(const UQuestDefinition* QuestDefinition) const
@@ -285,3 +315,22 @@ void UQuestManagerSubsystem::DebugLogQuestRewardGranted(FGameplayTag QuestID, in
 {
 	UE_LOG(LogTemp, Log, TEXT("Quest reward granted. %s: %d XP"), *QuestID.ToString(), RewardXP);
 }
+
+UQuestDefinition* UQuestManagerSubsystem::ResolveQuestDefinition(FGameplayTag QuestID)
+{
+	if (!QuestID.IsValid())
+	{
+		return nullptr;
+	}
+	
+	FPrimaryAssetId AssetId(UQuestDefinition::QuestAssetType, QuestID.GetTagName());
+	UAssetManager& AssetManager = UAssetManager::Get();
+	FSoftObjectPath AssetPath = AssetManager.GetPrimaryAssetPath(AssetId);
+	if (AssetPath.IsValid())
+	{
+		return Cast<UQuestDefinition>(AssetPath.TryLoad());
+	}
+
+	return nullptr;
+}
+

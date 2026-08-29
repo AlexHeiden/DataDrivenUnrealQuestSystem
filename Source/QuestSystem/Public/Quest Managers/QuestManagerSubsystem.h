@@ -39,6 +39,7 @@ struct FActiveQuestState
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnQuestStateChanged, FGameplayTag, QuestID);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnObjectiveProgressChanged, FGameplayTag, QuestID, int32, ObjectiveIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnQuestRewardGranted, FGameplayTag, QuestID, int32, RewardXP);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnQuestsLoaded);
 
 UCLASS(Blueprintable)
 class UQuestManagerSubsystem: public UGameInstanceSubsystem
@@ -53,6 +54,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="Quest")
 	FOnQuestRewardGranted OnQuestRewardGranted;
+
+	UPROPERTY(BlueprintAssignable, Category="Quest")
+	FOnQuestsLoaded OnQuestsLoaded;
 	
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
@@ -77,6 +81,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Quest")
 	void SaveQuestState() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Quest")
+	void LoadQuestState();
 
 private:
 	UPROPERTY()
@@ -104,4 +111,6 @@ private:
 	void HandleGameplayEvent(FGameplayTag EventTag, const FQuestEventPayload& EventPayload);
 	void RegisterQuestListeners(FGameplayTag EventID);
 	void UnregisterQuestListeners(FGameplayTag EventID);
+
+	UQuestDefinition* ResolveQuestDefinition(FGameplayTag QuestID);
 };

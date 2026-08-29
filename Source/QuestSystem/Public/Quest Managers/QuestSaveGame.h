@@ -9,8 +9,11 @@ USTRUCT()
 struct FQuestSaveData
 {
 	GENERATED_BODY()
-	
+
+	UPROPERTY()
 	int32 CurrentObjectiveIndex = 0;
+
+	UPROPERTY()
 	TArray<FQuestObjectiveProgress> ObjectiveProgresses;
 };
 
