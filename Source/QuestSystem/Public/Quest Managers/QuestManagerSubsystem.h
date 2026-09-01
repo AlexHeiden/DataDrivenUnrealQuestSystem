@@ -99,11 +99,7 @@ private:
 
 	static bool IsObjectiveCompleted(const FQuestObjectiveProgress* ObjectiveProgress, const FQuestObjectiveData* ObjectiveData);
 	static bool HasCompletedAllObjectives(const FActiveQuestState* ActiveQuestState);
-
-	UFUNCTION()
-	void DebugLogQuestStateChanged(FGameplayTag QuestID);
-	UFUNCTION()
-	void DebugLogObjectiveProgressChanged(FGameplayTag QuestID, int32 ObjectiveIndex);
+	
 	UFUNCTION()
 	void DebugLogQuestRewardGranted(FGameplayTag QuestID, int32 RewardXP);
 	

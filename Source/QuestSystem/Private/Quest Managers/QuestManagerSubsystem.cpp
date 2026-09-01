@@ -8,13 +8,12 @@
 void UQuestManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
-	OnQuestStateChanged.AddDynamic(this, &UQuestManagerSubsystem::UQuestManagerSubsystem::DebugLogQuestStateChanged);
-	OnObjectiveProgressChanged.AddDynamic(this, &UQuestManagerSubsystem::DebugLogObjectiveProgressChanged);
 	OnQuestRewardGranted.AddDynamic(this, &UQuestManagerSubsystem::DebugLogQuestRewardGranted);
 }
 
 void UQuestManagerSubsystem::Deinitialize()
 {
+	OnQuestRewardGranted.Clear();
 	UGameplayMessageSubsystem& GameplayMessageSubsystem = UGameplayMessageSubsystem::Get(GetWorld());
 	for (auto& Pair: ListenerHandles)
 	{
@@ -299,16 +298,6 @@ void UQuestManagerSubsystem::UnregisterQuestListeners(FGameplayTag EventID)
 
 		ListenerRefCounts.Remove(EventID);
 	}
-}
-
-void UQuestManagerSubsystem::DebugLogQuestStateChanged(FGameplayTag QuestID)
-{
-	UE_LOG(LogTemp, Log, TEXT("Quest state changed: %s"), *QuestID.ToString())
-}
-
-void UQuestManagerSubsystem::DebugLogObjectiveProgressChanged(FGameplayTag QuestID, int32 ObjectiveIndex)
-{
-	UE_LOG(LogTemp, Log, TEXT("Quest objective changed: %s, objective: %d"), *QuestID.ToString(), ObjectiveIndex);
 }
 
 void UQuestManagerSubsystem::DebugLogQuestRewardGranted(FGameplayTag QuestID, int32 RewardXP)
