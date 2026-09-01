@@ -3,6 +3,8 @@
 #include "GameplayTagContainer.h"
 #include "QuestBroadcasterComponent.generated.h"
 
+// Blueprint component to use in all actors which broadcast quest events
+// Filled and used by game designers in the Engine
 UCLASS(ClassGroup = Quest, meta=(BlueprintSpawnableComponent))
 class UQuestBroadcasterComponent: public UActorComponent
 {

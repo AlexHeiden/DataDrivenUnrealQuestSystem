@@ -5,6 +5,7 @@
 #include "GameFramework/SaveGame.h"
 #include "QuestSaveGame.generated.h"
 
+// Container for saving a single quest's progress
 USTRUCT()
 struct FQuestSaveData
 {
@@ -17,6 +18,7 @@ struct FQuestSaveData
 	TArray<FQuestObjectiveProgress> ObjectiveProgresses;
 };
 
+// Container for saving all quests' progress
 UCLASS()
 class UQuestSaveGame: public USaveGame
 {

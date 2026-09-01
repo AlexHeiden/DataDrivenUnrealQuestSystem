@@ -7,6 +7,7 @@
 #include "QuestDefinition.generated.h"
 
 // Quest data asset
+// Filled and used by game designers in the Engine
 UCLASS(BlueprintType)
 class UQuestDefinition: public UPrimaryDataAsset
 {

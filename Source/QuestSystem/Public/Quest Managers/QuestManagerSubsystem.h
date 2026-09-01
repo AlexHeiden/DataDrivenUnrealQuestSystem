@@ -41,20 +41,21 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnObjectiveProgressChanged, FGamep
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnQuestRewardGranted, FGameplayTag, QuestID, int32, RewardXP);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnQuestsLoaded);
 
+// GameInstanceSubsystem controlling the quests' acceptance, progression and completion
 UCLASS(Blueprintable)
 class UQuestManagerSubsystem: public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 public:
+	// Delegates for world reactivity
+	// These are created just for the demonstration purpose
+	// See "Possible Next Steps" in "README" to see how it could be improved 
 	UPROPERTY(BlueprintAssignable, Category="Quest")
 	FOnQuestStateChanged OnQuestStateChanged;
-	
 	UPROPERTY(BlueprintAssignable, Category="Quest")
 	FOnObjectiveProgressChanged OnObjectiveProgressChanged;
-
 	UPROPERTY(BlueprintAssignable, Category="Quest")
 	FOnQuestRewardGranted OnQuestRewardGranted;
-
 	UPROPERTY(BlueprintAssignable, Category="Quest")
 	FOnQuestsLoaded OnQuestsLoaded;
 	

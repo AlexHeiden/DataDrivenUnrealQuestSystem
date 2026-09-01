@@ -3,6 +3,8 @@
 #include "Data Classes/QuestDefinition.h"
 #include "QuestGiverComponent.generated.h"
 
+// Blueprint component to use in quest-giving actors
+// Filled and used by game designers in the Engine
 UCLASS(ClassGroup = Quest, meta=(BlueprintSpawnableComponent))
 class UQuestGiverComponent: public UActorComponent
 {
