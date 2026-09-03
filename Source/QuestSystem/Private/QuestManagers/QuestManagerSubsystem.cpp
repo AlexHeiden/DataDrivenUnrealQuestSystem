@@ -28,6 +28,7 @@ void UQuestManagerSubsystem::Deinitialize()
 
 bool UQuestManagerSubsystem::AcceptQuest(UQuestDefinition* QuestDefinition)
 {
+	// Reject: null/invalid quest, no objectives, active/completed quest, prerequisutes unmet
 	if (QuestDefinition == nullptr
 		|| !QuestDefinition->QuestID.IsValid()
 		|| QuestDefinition->Objectives.Num() == 0
@@ -186,7 +187,8 @@ void UQuestManagerSubsystem::CompleteCurrentObjective(FQuestObjectiveProgress* C
 	{
 		return;
 	}
-	
+
+	// Must unregister using the current objective's TriggerTag before moving on to the next objective/quest end
 	UnregisterQuestListeners(ActiveQuestState->QuestDefinition->Objectives[ActiveQuestState->CurrentObjectiveIndex].TriggerTag);
 	CurrentObjectiveProgress->bCompleted = true;
 	ActiveQuestState->CurrentObjectiveIndex++;
@@ -194,6 +196,7 @@ void UQuestManagerSubsystem::CompleteCurrentObjective(FQuestObjectiveProgress* C
 
 void UQuestManagerSubsystem::HandleGameplayEvent(FGameplayTag EventTag, const FQuestEventPayload& EventPayload)
 {
+	// If Amount == 0, then there would be no objective progress at all, skip entirely
 	if (!EventPayload.InstigatorTag.IsValid() || EventPayload.Amount == 0)
 	{
 		return;
@@ -211,6 +214,8 @@ void UQuestManagerSubsystem::HandleGameplayEvent(FGameplayTag EventTag, const FQ
 		const FQuestObjectiveData& CurrentObjectiveData =
 			ActiveQuestState.QuestDefinition->Objectives[ActiveQuestState.CurrentObjectiveIndex];
 		FGameplayTagContainer EventTags = EventPayload.ModifierTags;
+		// InstigatorTag should be in the RequiredModifierTags too
+		// Adding InstigatorTag to other tags for a single HasAll() check
 		EventTags.AddTag(EventPayload.InstigatorTag);
 
 		// Check that the objective was listening for this event
@@ -241,9 +246,10 @@ void UQuestManagerSubsystem::HandleGameplayEvent(FGameplayTag EventTag, const FQ
 			continue;
 		}
 
+		// We can't remove the quests in a foreach loop, so we save their ids to delete them afterwards
 		QuestsToComplete.Add(ActiveQuestState.QuestDefinition->QuestID);
 	}
-
+	
 	for (FGameplayTag& QuestID : QuestsToComplete)
 	{
 		CompletedQuestIDs.AddTag(QuestID);
@@ -305,6 +311,8 @@ void UQuestManagerSubsystem::DebugLogQuestRewardGranted(FGameplayTag QuestID, in
 	UE_LOG(LogTemp, Log, TEXT("Quest reward granted. %s: %d XP"), *QuestID.ToString(), RewardXP);
 }
 
+// Always resolves via path + TryLoad()
+// A larger project might cache already loaded quests instead
 UQuestDefinition* UQuestManagerSubsystem::ResolveQuestDefinition(FGameplayTag QuestID)
 {
 	if (!QuestID.IsValid())
