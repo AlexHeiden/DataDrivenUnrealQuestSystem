@@ -27,6 +27,11 @@ struct FQuestObjectiveProgress
 };
 
 // Container sent by gameplay events to quest system through GMS
+// It allows to crete very specific conditions for a quest event you need
+// For example, if your player needs to kill the alpha wolf at night with a wooden bow, then the tags would be:
+// EventTag: Event.Kill (this one is set during broadcast to GMS);
+// InstigatorTag: Character.Wolf.Alpha;
+// ModifierTags: Time.Night, Weapon.WoodenBow
 USTRUCT(BlueprintType)
 struct FQuestEventPayload
 {
@@ -34,7 +39,7 @@ struct FQuestEventPayload
 
 	UPROPERTY(BlueprintReadWrite)
 	FGameplayTag InstigatorTag;	
-
+	
 	UPROPERTY(BlueprintReadWrite)
 	FGameplayTagContainer ModifierTags;
 	
