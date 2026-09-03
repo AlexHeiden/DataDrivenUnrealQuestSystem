@@ -1,4 +1,4 @@
-﻿#include "Public/Data Classes/QuestDefinition.h"
+﻿#include "Public/DataClasses/QuestDefinition.h"
 
 const FPrimaryAssetType UQuestDefinition::QuestAssetType(TEXT("Quest"));
 

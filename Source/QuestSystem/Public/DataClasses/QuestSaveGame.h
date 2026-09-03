@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "GameplayTagContainer.h"
-#include "Data Classes/QuestData.h"
+#include "Public/DataClasses/QuestData.h"
 #include "GameFramework/SaveGame.h"
 #include "QuestSaveGame.generated.h"
 

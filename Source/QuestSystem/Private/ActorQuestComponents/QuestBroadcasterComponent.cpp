@@ -1,6 +1,6 @@
-﻿#include "Actor Quest Components/QuestBroadcasterComponent.h"
+﻿#include "Public/ActorQuestComponents/QuestBroadcasterComponent.h"
 
-#include "Data Classes/QuestData.h"
+#include "Public/DataClasses/QuestData.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 
 void UQuestBroadcasterComponent::BroadcastQuestEvent()

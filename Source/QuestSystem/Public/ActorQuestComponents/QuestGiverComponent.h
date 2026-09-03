@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Data Classes/QuestDefinition.h"
+#include "Public/DataClasses/QuestDefinition.h"
 #include "QuestGiverComponent.generated.h"
 
 // Blueprint component to use in quest-giving actors

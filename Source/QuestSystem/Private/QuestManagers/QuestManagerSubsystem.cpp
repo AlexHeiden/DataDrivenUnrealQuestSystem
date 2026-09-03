@@ -1,9 +1,9 @@
-﻿#include "Public/Quest Managers/QuestManagerSubsystem.h"
+﻿#include "Public/QuestManagers/QuestManagerSubsystem.h"
 
 #include "Engine/AssetManager.h"
 #include "GameFramework/GameplayMessageSubsystem.h"
 #include "Kismet/GameplayStatics.h"
-#include "Quest Managers/QuestSaveGame.h"
+#include "Public/DataClasses//QuestSaveGame.h"
 
 void UQuestManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {

@@ -1,6 +1,6 @@
-﻿#include "Actor Quest Components/QuestGiverComponent.h"
+﻿#include "Public/ActorQuestComponents/QuestGiverComponent.h"
 
-#include "Quest Managers/QuestManagerSubsystem.h"
+#include "Public/QuestManagers/QuestManagerSubsystem.h"
 
 bool UQuestGiverComponent::TryAcceptQuest()
 {
