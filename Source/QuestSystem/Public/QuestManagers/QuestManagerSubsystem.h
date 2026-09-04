@@ -83,6 +83,9 @@ public:
 	void LoadQuestState();
 
 private:
+	// Simplified version of keeping the active quests
+	// A larger project would index all active quests by the EventTag, so that we iterate not over all quests,
+	// but over the ones which listen for this specific event
 	UPROPERTY()
 	TMap<FGameplayTag, FActiveQuestState> ActiveQuests;
 	
