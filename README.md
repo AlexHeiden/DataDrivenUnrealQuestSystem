@@ -16,7 +16,6 @@
 - [How to Extend](#how-to-extend)
 - [Known Limitations & Deliberate Scope Cuts](#known-limitations--deliberate-scope-cuts)
 - [Setup & Running the Demo](#setup--running-the-demo)
-- [Possible Next Steps](#possible-next-steps)
 
 ---
 
